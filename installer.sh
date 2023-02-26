@@ -69,7 +69,8 @@ composer require barryvdh/laravel-debugbar --dev &> /dev/null
 check_last_task
 
 printf "LARAVEL LOG VIEWER :: "
-composer require rap2hpoutre/laravel-log-viewer &> /dev/null
+composer require opcodesio/log-viewer &> /dev/null
+php artisan log-viewer:publish &> /dev/null
 check_last_task
 
 echo 'DONE!'
