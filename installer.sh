@@ -1,7 +1,7 @@
 #!/bin/bash
 # Copyright (c) 2023 Daniel Fagundes <daniell.felipe.2017@gmail.com>
 #
-# This is a bash script that creates new laravel projects on Ubuntu based distros.
+# This is a bash script that creates new laravel projects on Linux distros.
 #
 # The script triggers the laravel installer and creates a fresh laravel installation
 # with some common packages as Phpstan, Pest, Sail and more.
