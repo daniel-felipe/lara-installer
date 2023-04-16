@@ -1,5 +1,5 @@
 # Lara Installer
-This is a simple bash script that creates a fresh laravel installation with some extra packages on Ubuntu based Linux distros.
+This is a simple bash script that creates a fresh laravel installation with some extra packages on Linux distros.
 
 ## How to use
 
