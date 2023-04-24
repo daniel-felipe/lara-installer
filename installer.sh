@@ -31,10 +31,10 @@ esac
 
 # [CHECK DEPENDECIES]
 laravel --version &> /dev/null
-if [ ! $? -eq 0 ]; then
+if [ $? -ne 0 ]; then
     composer global require laravel/installer
-    export PATH="$(echo ~)/.config/composer/vendor/bin:$PATH"
-    export PATH="$(echo ~)/.composer/vendor/bin:$PATH"
+    export PATH="$HOME/.config/composer/vendor/bin:$PATH"
+    export PATH="$HOME/.composer/vendor/bin:$PATH"
 fi
 
 # [CREATE NEW APP]
