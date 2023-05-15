@@ -10,6 +10,12 @@
 # ./installer.sh project_name
 
 source ./setup/inc/helpers.sh
+echo $green" _                   _           _        _ _           "
+echo '| | __ _ _ __ __ _  (_)_ __  ___| |_ __ _| | | ___ _ __ '
+echo "| |/ _\` | '__/ _\` | | | '_ \/ __| __/ _\` | | |/ _ \ '__|"
+echo '| | (_| | | | (_| | | | | | \__ \ || (_| | | |  __/ |   '
+echo '|_|\__,_|_|  \__,_| |_|_| |_|___/\__\__,_|_|_|\___|_|  '$none
+echo
 
 echo "Which is your base distro"
 echo "[1] :: Ubuntu"
@@ -29,7 +35,17 @@ case $distro in
         ;;
 esac
 
-# [CHECK DEPENDECIES]
+# [CHECK COMPOSER]
+composer --version &> /dev/null
+if [ $? -ne 0 ]; then
+    php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+    php -r "if (hash_file('sha384', 'composer-setup.php') === '55ce33d7678c5a611085589f1f3ddf8b3c52d662cd01d4ba75c0ee0459970c2200a51f492d557530c71c15d8dba01eae') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+    php composer-setup.php
+    php -r "unlink('composer-setup.php');"
+    sudo mv composer.phar /usr/local/bin/composer
+fi
+
+# [CHECK LARAVEL INSTALLER]
 laravel --version &> /dev/null
 if [ $? -ne 0 ]; then
     composer global require laravel/installer
@@ -48,28 +64,35 @@ fi
 
 if [ -f "$APP_NAME" ]; then
     echo "The app \"$APP_NAME\" already exists."
-    exit
+    exit 1
 fi
 
-printf "Creating new Laravel app...\n";
+# [CREATING NEW APP]
+printf "${yellow}[+] Creating new Laravel app${none}\n";
 laravel new "$APP_NAME" --pest --breeze && cd "$APP_NAME"
-composer require laravel/sail --dev &> /dev/null
-php artisan sail:install
-./vendor/bin/sail up -d
-./vendor/bin/sail npm install
+
+docker -v &> /dev/null
+if [ $? -eq 0 ]; then
+    printf "${yellow}[+] Installing sail${none}\n"
+    composer require laravel/sail --dev &> /dev/null
+    php artisan sail:install
+    ./vendor/bin/sail up -d
+    ./vendor/bin/sail npm install
+fi
 
 # [INSTALLING EXTRA PACKAGES]
-printf "PHPSTAN :: "
-composer require nunomaduro/larastan:^2.0 --dev &> /dev/null && echo '//' >> phpstan.neon &> /dev/null 
-check_last_task
-
-printf "LARAVEL DEBUGBAR :: "
-composer require barryvdh/laravel-debugbar --dev &> /dev/null
-check_last_task
-
-printf "LARAVEL LOG VIEWER :: "
+printf "${yellow}[+] Installing extra packages${none}\n"
+printf "=> Log Viewer\t"
 composer require opcodesio/log-viewer &> /dev/null
 php artisan log-viewer:publish &> /dev/null
 check_last_task
 
-echo 'DONE!'
+printf "=> Larastan\t"
+composer require nunomaduro/larastan:^2.0 --dev &> /dev/null && echo '//' >> phpstan.neon &> /dev/null 
+check_last_task
+
+printf "=> Debugbar\t"
+composer require barryvdh/laravel-debugbar --dev &> /dev/null
+check_last_task
+
+echo "${green}Done!${none}"
